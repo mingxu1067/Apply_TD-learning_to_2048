@@ -9,7 +9,7 @@ using namespace std;
 typedef struct {
     int** board;
     int update_value;
-}record;
+}Record;
 
 class TDModel {
 public:
@@ -26,7 +26,7 @@ private:
     map<string, int> _value_table_14;
     map<string, int> _value_table_23;
 
-    list<record> record_list;
+    list<Record> record_list;
 
     typedef map<string, int>::iterator mapIter;
 
@@ -41,4 +41,6 @@ private:
     int getTileType(int index);
 
     int getValueByMap(map<string, int> map, string key);
+
+    int pickMoveDirection(Game game, int& score);
 };

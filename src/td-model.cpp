@@ -14,12 +14,24 @@ TDModel::~TDModel() {}
 *   Public finction
 */
 void TDModel::train(int times) {
+    srand(time(NULL));
+
     for (int train_round = 0; train_round < times; train_round++) {
         Game game = Game();
-        const int **game_board = (const int**) game.getCopyCheckerboard();
-        printf("%d\n", valueOfState(game_board));
+        // while (game.isGameOver()) {
+            int **game_board = game.getCopyCheckerboard();
 
-        delete [] game_board;
+            int update_value = 0;
+            int direction = pickMoveDirection(game, update_value);
+
+            game.move(direction);
+            game.randomGenerate((rand() % 2) + 1);
+
+            Record record = {game_board, update_value};
+            record_list.push_front(record);
+
+            delete [] game_board;
+        // }
     }
 }
 
@@ -83,4 +95,8 @@ int TDModel::getValueByMap(map<string, int> map, string key) {
     }
 
     return 0;
+}
+
+int TDModel::pickMoveDirection(Game game, int& score) {
+
 }
