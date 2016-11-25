@@ -20,7 +20,7 @@ public:
     int test(int times);
 
     void storeModel(string path);
-    void inputMpdel(string path);
+    void inputModel(string path);
 
     void set_learning_rate(float rate);
 

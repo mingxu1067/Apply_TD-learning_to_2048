@@ -44,12 +44,26 @@ void TDModel::train(int times) {
 
         updateValueMap();
     }
-
-    storeModel("./td_model");
 }
 
 int TDModel::test(int times) {
-    return 0;
+    unsigned long total_sorce = 0;
+    for (int train_round = 0; train_round < times; train_round++) {
+        Game game = Game();
+
+        unsigned long round_sorce = 0;
+        while (!game.isGameOver()) {
+            int **game_board = game.getCopyCheckerboard();
+
+            double update_value = 0;
+            int direction = pickMoveDirection(game, update_value);
+            game.move(direction);
+            game.randomGenerate((rand() % 2) + 1);
+        }
+
+        total_sorce += game.get_score();
+    }
+    return total_sorce/times;
 }
 
 void TDModel::storeModel(string path) {
@@ -59,6 +73,7 @@ void TDModel::storeModel(string path) {
         printf("There are diretories which doesn't exist.\n");
     }
 
+    printf("Store model to %s\n", path.c_str());
     fout << kTileType14 << "\t" << kTileType14 << endl;
     for(map<string, double>::iterator iter = _value_table_14.begin(); iter != _value_table_14.end(); iter++) {
         fout << iter->first << "\t" << iter->second << endl;
@@ -72,7 +87,7 @@ void TDModel::storeModel(string path) {
     fout.close();
 }
 
-void TDModel::inputMpdel(string path) {
+void TDModel::inputModel(string path) {
     path += kModelName;
     ifstream fin(path); 
 
@@ -80,6 +95,7 @@ void TDModel::inputMpdel(string path) {
         printf("There are diretories which doesn't exist.\n");
     }
 
+    printf("Input model to %s\n", path.c_str());
     string type;
     double val;
     fin >> type >> val;
