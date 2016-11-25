@@ -8,7 +8,7 @@ using namespace std;
 
 typedef struct {
     int** board;
-    int update_value;
+    double update_value;
 }Record;
 
 class TDModel {
@@ -19,28 +19,38 @@ public:
     void train(int times);
     int test(int times);
 
+    void storeModel(string path);
+    void inputMpdel(string path);
+
+    void set_learning_rate(float rate);
+
 private:
     const static int kTileType14 = 0;
     const static int kTileType23 = 1;
+    const static string kModelName;
 
-    map<string, int> _value_table_14;
-    map<string, int> _value_table_23;
+    map<string, double> _value_table_14;
+    map<string, double> _value_table_23;
 
-    list<Record> record_list;
+    list<Record> _record_list;
 
-    typedef map<string, int>::iterator mapIter;
+    typedef map<string, double>::iterator mapIter;
 
     float _learning_rate;
 
-    int valueOfState(const int** board);
+    double valueOfState(const int** board);
 
-    int evaluteTile(int tile_type, const int* tile);
+    double evaluteTile(int tile_type, const int* tile);
 
     string changeTileToKey(const int *tile);
 
     int getTileType(int index);
 
-    int getValueByMap(map<string, int> map, string key);
+    double getValueByMap(map<string, double> map, string key);
 
-    int pickMoveDirection(Game game, int& score);
+    int pickMoveDirection(Game game, double& score);
+
+    void updateValueMap();
+
+    void replaceValueInMap(int tile_type, string key, double update_value);
 };
