@@ -18,20 +18,22 @@ void TDModel::train(int times) {
 
     for (int train_round = 0; train_round < times; train_round++) {
         Game game = Game();
-        // while (game.isGameOver()) {
+        while (!game.isGameOver()) {
             int **game_board = game.getCopyCheckerboard();
 
             int update_value = 0;
             int direction = pickMoveDirection(game, update_value);
 
+            printf("Pick direction \"D%d\" with evaluation \"%d\"\n", direction, update_value);
+
             game.move(direction);
             game.randomGenerate((rand() % 2) + 1);
+            game.printCheckerboard();
+            printf("==================================\n");
 
             Record record = {game_board, update_value};
             record_list.push_front(record);
-
-            delete [] game_board;
-        // }
+        }
     }
 }
 
@@ -98,5 +100,25 @@ int TDModel::getValueByMap(map<string, int> map, string key) {
 }
 
 int TDModel::pickMoveDirection(Game game, int& score) {
+    typedef int (*Move)(int **);
 
+    int direction[4] = {Game::kMoveUp, Game::kMoveDown, Game::kMoveLeft, Game::kMoveRight};
+    Move move[4] = {&Game::moveUp, &Game::moveDown, &Game::moveLeft, &Game::moveRight};
+
+    int resultDirection = direction[0];
+    for (int i=0; i<4; i++) {
+        int **board = game.getCopyCheckerboard();
+        int reward = move[i](board);
+        reward += valueOfState((const int**)board);
+
+        if (reward >= score) {
+            score = reward;
+            resultDirection = direction[i];
+        }
+    }
+
+    return resultDirection;
 }
+
+
+
