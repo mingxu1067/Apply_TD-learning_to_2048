@@ -30,6 +30,8 @@ public:
 
     bool isGameOver();
 
+    long get_score();
+
     static long moveUp(int **checkerboard);
 
     static long moveDown(int **checkerboard);
@@ -40,7 +42,7 @@ public:
 
 private:
     int** _checkerboard;
-    int _sorce;
+    long _sorce;
     LinkedList _empty_list;
 
     void initCheckerBoard();
