@@ -30,13 +30,13 @@ public:
 
     bool isGameOver();
 
-    static int moveUp(int **checkerboard);
+    static long moveUp(int **checkerboard);
 
-    static int moveDown(int **checkerboard);
+    static long moveDown(int **checkerboard);
 
-    static int moveLeft(int **checkerboard);
+    static long moveLeft(int **checkerboard);
 
-    static int moveRight(int **checkerboard);
+    static long moveRight(int **checkerboard);
 
 private:
     int** _checkerboard;
@@ -47,7 +47,7 @@ private:
 
     void setupEmptyList();
 
-    static void mergeGrid(int **checkerboard, CheckerboardIndex target, CheckerboardIndex operate, int &sorce, CheckerboardIndex &stop_index);
+    static void mergeGrid(int **checkerboard, CheckerboardIndex target, CheckerboardIndex operate, long &sorce, CheckerboardIndex &stop_index);
 
 };
 
