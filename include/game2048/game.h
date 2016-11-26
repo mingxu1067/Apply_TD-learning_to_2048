@@ -32,6 +32,8 @@ public:
 
     long get_score();
 
+    static bool isMoveWork();
+
     static long moveUp(int **checkerboard);
 
     static long moveDown(int **checkerboard);
@@ -44,6 +46,7 @@ private:
     int** _checkerboard;
     long _sorce;
     LinkedList _empty_list;
+    static bool _is_move_work;
 
     void initCheckerBoard();
 
