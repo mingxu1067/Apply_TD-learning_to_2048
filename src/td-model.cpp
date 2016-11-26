@@ -35,13 +35,14 @@ void TDModel::train(int times) {
             printf("Pick direction \"D%d\" with evaluation \"%f\"\n", direction, _learning_rate*update_value);
 
             game.move(direction);
-            game.randomGenerate((rand() % 2) + 1);
+            game.randomGenerate(1);
             game.printCheckerboard();
 
             Record record = {game_board, update_value};
             _record_list.push_front(record);
         }
 
+        printf("\n");
         updateValueMap();
     }
 }
@@ -60,7 +61,7 @@ int TDModel::test(int times) {
             game.move(direction);
             game.randomGenerate((rand() % 2) + 1);
         }
-
+        printf("Time:%d  sorce:%ld\n", train_round, game.get_score());
         total_sorce += game.get_score();
     }
     return total_sorce/times;
@@ -195,7 +196,12 @@ int TDModel::pickMoveDirection(Game game, double& score) {
     int resultDirection = direction[0];
     for (int i=0; i<4; i++) {
         int **board = game.getCopyCheckerboard();
-        double reward = move[i](board) + valueOfState((const int**)board);
+        double reward = move[i](board);
+        // printf("move val:%f\n", reward);
+        reward += valueOfState((const int**)board);
+        // printf("state val:%f\n", valueOfState((const int**)board));
+        // printf("total: %f\n", reward);
+        // printf("%dis work? %d\n",direction[i] , Game::isMoveWork());
         if ((Game::isMoveWork()) && (reward >= score)) {
             score = reward;
             resultDirection = direction[i];
