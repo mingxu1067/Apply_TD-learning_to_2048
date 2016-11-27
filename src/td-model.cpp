@@ -32,7 +32,7 @@ void TDModel::train(int times) {
             double update_value = 0;
             int direction = pickMoveDirection(game, update_value);
 
-            printf("Pick direction \"D%d\" with evaluation \"%f\"\n", direction, _learning_rate*update_value);
+            printf("Pick direction \"D%d\" with evaluation \"%f\"\n", direction, update_value);
 
             game.move(direction);
             game.randomGenerate(1);
@@ -59,7 +59,7 @@ int TDModel::test(int times) {
             double update_value = 0;
             int direction = pickMoveDirection(game, update_value);
             game.move(direction);
-            game.randomGenerate((rand() % 2) + 1);
+            game.randomGenerate(1);
         }
         printf("Time:%d  sorce:%ld\n", train_round, game.get_score());
         total_sorce += game.get_score();
@@ -178,7 +178,7 @@ int TDModel::getTileType(int index) {
 }
 
 double TDModel::getValueByMap(map<string, double> map, string key) {
-    mapIter iter = map.find(key);
+    MapIter iter = map.find(key);
 
     if (iter != map.end()) {
         return iter->second;
@@ -193,19 +193,27 @@ int TDModel::pickMoveDirection(Game game, double& score) {
     int direction[4] = {Game::kMoveUp, Game::kMoveDown, Game::kMoveLeft, Game::kMoveRight};
     Move move[4] = {&Game::moveUp, &Game::moveDown, &Game::moveLeft, &Game::moveRight};
 
-    int resultDirection = direction[0];
+    int resultDirection = -1;
     for (int i=0; i<4; i++) {
         int **board = game.getCopyCheckerboard();
         double reward = move[i](board);
-        // printf("move val:%f\n", reward);
         reward += valueOfState((const int**)board);
-        // printf("state val:%f\n", valueOfState((const int**)board));
-        // printf("total: %f\n", reward);
-        // printf("%dis work? %d\n",direction[i] , Game::isMoveWork());
-        if ((Game::isMoveWork()) && (reward >= score)) {
-            score = reward;
-            resultDirection = direction[i];
+        printf("%d get reward: %f\n",direction[i], reward);
+        printf("%d is work? %d\n",direction[i] , Game::isMoveWork());
+
+        if ((Game::isMoveWork())) {
+            if (resultDirection == -1) {
+                score = reward;
+                resultDirection = direction[i];
+            } else {
+                if (reward >= score) {
+                    score = reward;
+                    resultDirection = direction[i];
+                }
+            }
         }
+
+        delete [] board;
     }
 
     return resultDirection;

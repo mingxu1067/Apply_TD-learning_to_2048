@@ -34,7 +34,7 @@ private:
 
     list<Record> _record_list;
 
-    typedef map<string, double>::iterator mapIter;
+    typedef map<string, double>::iterator MapIter;
 
     float _learning_rate;
 
