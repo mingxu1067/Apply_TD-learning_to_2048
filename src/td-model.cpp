@@ -33,7 +33,7 @@ void TDModel::train(int times) {
 
             double update_value = 0;
             int direction = pickMoveDirection(game, update_value);
-            
+
 
             printf("Pick direction \"D%d\" with evaluation \"%f\"\n", direction, update_value);
 
@@ -43,12 +43,11 @@ void TDModel::train(int times) {
 
             Record record = {game_board, valueOfState((const int**)game_board), update_value};
             _record_list.push_front(record);
-            // updateValueMap();
         }
-        _record_list.pop_front();
-        int **bd = game.getCopyCheckerboard();
-        Record record = {bd, valueOfState((const int**)bd), 0.0};
-        _record_list.push_front(record);
+        // _record_list.pop_front();
+        // int **bd = game.getCopyCheckerboard();
+        // Record record = {bd, valueOfState((const int**)bd), 0.0};
+        // _record_list.push_front(record);
 
         printf("\n");
         updateValueMap();
@@ -228,7 +227,7 @@ int TDModel::pickMoveDirection(Game game, double& score) {
         delete [] board;
     }
     if (resultDirection == -1) {
-        printf("Pick wrong direction\n");
+        printf("Terminal state.\n");
     }
     return resultDirection;
 }
@@ -237,15 +236,8 @@ void TDModel::updateValueMap() {
     while (!_record_list.empty()) {
         Record record = _record_list.front();
         int **board = record.board;
-        // for (int row=0; row < 4; row++) {
-        //     for (int col = 0; col < 4; col++) {
-        //         printf("%4d", board[row][col]);
-        //     }
-        //     printf("\n");
-        // }
 
         double update_value = _learning_rate * (record.update_value - record.origin_state_values);
-        // printf("%f = %f*(%f - %f)\n", update_value, _learning_rate, record.update_value, record.origin_state_values);
 
         for (int row = 0; row < CHECKERBOARD_LENGTH; row++) {
             string key = changeTileToKey((const int*)(*(board+row)));
