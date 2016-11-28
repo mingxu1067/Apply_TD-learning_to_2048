@@ -11,6 +11,7 @@ using namespace std;
 
 typedef struct {
     int** board;
+    double origin_state_values;
     double update_value;
 }Record;
 

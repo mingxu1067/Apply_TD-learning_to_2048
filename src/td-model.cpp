@@ -1,7 +1,7 @@
 #include "td-model.h"
-#include "stdio.h"
+#include <stdio.h>
 #include <fstream> 
-
+#include <math.h>
 /*
 *   Constant Variable Initialize
 */
@@ -21,26 +21,34 @@ TDModel::~TDModel() {}
 *   Public finction
 */
 void TDModel::train(int times) {
-    srand(time(NULL));
-
     for (int train_round = 0; train_round < times; train_round++) {
         printf("===========================Trainning Round:%d===========================\n", train_round);
         Game game = Game();
+        int random_count = 2;
+
         while (!game.isGameOver()) {
             int **game_board = game.getCopyCheckerboard();
+            game.randomGenerate(random_count);
+            random_count = 1;
 
             double update_value = 0;
             int direction = pickMoveDirection(game, update_value);
+            
 
             printf("Pick direction \"D%d\" with evaluation \"%f\"\n", direction, update_value);
 
             game.move(direction);
-            game.randomGenerate(1);
-            game.printCheckerboard();
+            // game.printCheckerboard();
+            // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-            Record record = {game_board, update_value};
+            Record record = {game_board, valueOfState((const int**)game_board), update_value};
             _record_list.push_front(record);
+            // updateValueMap();
         }
+        _record_list.pop_front();
+        int **bd = game.getCopyCheckerboard();
+        Record record = {bd, valueOfState((const int**)bd), 0.0};
+        _record_list.push_front(record);
 
         printf("\n");
         updateValueMap();
@@ -51,6 +59,7 @@ int TDModel::test(int times) {
     unsigned long total_sorce = 0;
     for (int train_round = 0; train_round < times; train_round++) {
         Game game = Game();
+        game.randomGenerate(2);
 
         unsigned long round_sorce = 0;
         while (!game.isGameOver()) {
@@ -156,7 +165,11 @@ double TDModel::evaluteTile(int tile_type, const int* tile) {
 string TDModel::changeTileToKey(const int *tile) {
     string key = string("");
     for (int i = 0; i < CHECKERBOARD_LENGTH; i++) {
-        key += to_string(tile[i]);
+        if (tile[i] == 0) {
+            key += "0";
+            continue;
+        }
+        key += to_string((int)(log(tile[i]) / log(2)));
     }
 
     return key;
@@ -197,9 +210,8 @@ int TDModel::pickMoveDirection(Game game, double& score) {
     for (int i=0; i<4; i++) {
         int **board = game.getCopyCheckerboard();
         double reward = move[i](board);
+        // printf("%d get reward: %f v(s-next): %f\n",direction[i], reward, valueOfState((const int**)board));
         reward += valueOfState((const int**)board);
-        printf("%d get reward: %f\n",direction[i], reward);
-        printf("%d is work? %d\n",direction[i] , Game::isMoveWork());
 
         if ((Game::isMoveWork())) {
             if (resultDirection == -1) {
@@ -215,7 +227,9 @@ int TDModel::pickMoveDirection(Game game, double& score) {
 
         delete [] board;
     }
-
+    if (resultDirection == -1) {
+        printf("Pick wrong direction\n");
+    }
     return resultDirection;
 }
 
@@ -223,7 +237,15 @@ void TDModel::updateValueMap() {
     while (!_record_list.empty()) {
         Record record = _record_list.front();
         int **board = record.board;
-        double update_value = _learning_rate * (record.update_value - valueOfState((const int**)board));
+        // for (int row=0; row < 4; row++) {
+        //     for (int col = 0; col < 4; col++) {
+        //         printf("%4d", board[row][col]);
+        //     }
+        //     printf("\n");
+        // }
+
+        double update_value = _learning_rate * (record.update_value - record.origin_state_values);
+        // printf("%f = %f*(%f - %f)\n", update_value, _learning_rate, record.update_value, record.origin_state_values);
 
         for (int row = 0; row < CHECKERBOARD_LENGTH; row++) {
             string key = changeTileToKey((const int*)(*(board+row)));
@@ -239,7 +261,6 @@ void TDModel::updateValueMap() {
             replaceValueInMap(getTileType(col), key, update_value);
             delete [] tile;
         }
-
         _record_list.pop_front();
     }
 }
