@@ -1,3 +1,6 @@
+#ifndef GAME2048_TD_LEARNING_H_
+#define GAME2048_TD_LEARNING_H_
+
 #include "string"
 #include "map"
 #include "list"
@@ -54,3 +57,5 @@ private:
 
     void replaceValueInMap(int tile_type, string key, double update_value);
 };
+
+#endif
