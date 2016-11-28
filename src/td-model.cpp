@@ -56,6 +56,7 @@ void TDModel::train(int times) {
 
 int TDModel::test(int times) {
     unsigned long total_sorce = 0;
+    unsigned long max = 0;
     for (int train_round = 0; train_round < times; train_round++) {
         Game game = Game();
         game.randomGenerate(2);
@@ -68,10 +69,14 @@ int TDModel::test(int times) {
             int direction = pickMoveDirection(game, update_value);
             game.move(direction);
             game.randomGenerate(1);
+
+            delete [] game_board;
         }
         printf("Time:%d  sorce:%ld\n", train_round, game.get_score());
+        max = game.get_score() >= max? game.get_score():max;
         total_sorce += game.get_score();
     }
+    printf("The maximum score: %lu\n", max);
     return total_sorce/times;
 }
 
@@ -236,9 +241,15 @@ void TDModel::updateValueMap() {
     while (!_record_list.empty()) {
         Record record = _record_list.front();
         int **board = record.board;
+        // for (int r=0;r<4;r++) {
+        //     for(int c=0;c<4;c++){
+        //         printf("%4d", board[r][c]);
+        //     }
+        //     printf("\n");
+        // }
 
         double update_value = _learning_rate * (record.update_value - record.origin_state_values);
-
+        // printf("%f = %f*(%f - %f)\n", update_value, _learning_rate, record.update_value, record.origin_state_values);
         for (int row = 0; row < CHECKERBOARD_LENGTH; row++) {
             string key = changeTileToKey((const int*)(*(board+row)));
             replaceValueInMap(getTileType(row), key, update_value);
@@ -253,6 +264,7 @@ void TDModel::updateValueMap() {
             replaceValueInMap(getTileType(col), key, update_value);
             delete [] tile;
         }
+        delete [] board;
         _record_list.pop_front();
     }
 }

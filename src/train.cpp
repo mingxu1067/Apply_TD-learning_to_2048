@@ -5,13 +5,13 @@ int main(int argc, char const *argv[]) {
     float l_rate = 0.0025;
     TDModel td_model_2048 = TDModel(l_rate);
 
-    // td_model_2048.inputModel("./td_model");
-    for (int i = 0; i < 10; i++) {
+    td_model_2048.inputModel("./td_model");
+    for (int i = 0; i < 100; i++) {
         int train_times = 100;
         printf("Train with {learning rate: %f} in {times:%d}\n", l_rate, train_times);
         td_model_2048.train(train_times);
 
-        td_model_2048.storeModel("./td_model");
+        // td_model_2048.storeModel("./td_model");
     }
 
     // td_model_2048.inputModel("./td_model");
