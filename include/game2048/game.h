@@ -20,6 +20,8 @@ public:
 
     void start();
 
+    void reset();
+
     void move(int direction);
 
     void printCheckerboard();
