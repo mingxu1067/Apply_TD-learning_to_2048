@@ -52,6 +52,8 @@ private:
 
     void initCheckerBoard();
 
+    void deleteCheckerboard();
+
     void setupEmptyList();
 
     static void mergeGrid(int **checkerboard, CheckerboardIndex target, CheckerboardIndex operate, long &sorce, CheckerboardIndex &stop_index);
