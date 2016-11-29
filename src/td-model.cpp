@@ -22,7 +22,7 @@ TDModel::~TDModel() {}
 */
 void TDModel::train(int times) {
     for (int train_round = 0; train_round < times; train_round++) {
-        printf("===========================Trainning Round:%d===========================\n", train_round);
+        printf("===========================Trainning Round:%d===========================\n", train_round+1);
         Game game = Game();
         int random_count = 2;
 
@@ -36,48 +36,53 @@ void TDModel::train(int times) {
 
 
             printf("Pick direction \"D%d\" with evaluation \"%f\"\n", direction, update_value);
-
-            game.move(direction);
+            if (direction != -1)
+                game.move(direction);
             // game.printCheckerboard();
             // printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
             Record record = {game_board, valueOfState((const int**)game_board), update_value};
             _record_list.push_front(record);
         }
-        // _record_list.pop_front();
-        // int **bd = game.getCopyCheckerboard();
-        // Record record = {bd, valueOfState((const int**)bd), 0.0};
-        // _record_list.push_front(record);
 
         printf("\n");
         updateValueMap();
     }
 }
 
-int TDModel::test(int times) {
+void TDModel::test(int times) {
     unsigned long total_sorce = 0;
-    unsigned long max = 0;
+    unsigned long max_source = 0;
+    int max_number = 0;
     for (int train_round = 0; train_round < times; train_round++) {
         Game game = Game();
         game.randomGenerate(2);
 
         unsigned long round_sorce = 0;
         while (!game.isGameOver()) {
-            int **game_board = game.getCopyCheckerboard();
-
             double update_value = 0;
             int direction = pickMoveDirection(game, update_value);
             game.move(direction);
             game.randomGenerate(1);
-
-            delete [] game_board;
         }
         printf("Time:%d  sorce:%ld\n", train_round, game.get_score());
-        max = game.get_score() >= max? game.get_score():max;
+        max_source = game.get_score() >= max_source? game.get_score():max_source;
         total_sorce += game.get_score();
+
+        int **board = game.getCopyCheckerboard();
+        for(int row=0; row<CHECKERBOARD_LENGTH; row++) {
+            for(int col=0; col<CHECKERBOARD_LENGTH; col++) {
+                if (board[row][col] > max_number) {
+                    max_number = board[row][col];
+                }
+            }
+        }
+        delete [] board;
     }
-    printf("The maximum score: %lu\n", max);
-    return total_sorce/times;
+    
+    printf("The maximum number %d\n", max_number);
+    printf("The maximum score: %lu\n", max_source);
+    printf("Test Average Result: %lu\n", total_sorce/times);
 }
 
 void TDModel::storeModel(string path) {
@@ -204,7 +209,7 @@ double TDModel::getValueByMap(map<string, double> map, string key) {
     return 0;
 }
 
-int TDModel::pickMoveDirection(Game game, double& score) {
+int TDModel::pickMoveDirection(Game &game, double& score) {
     typedef long (*Move)(int **);
 
     int direction[4] = {Game::kMoveUp, Game::kMoveDown, Game::kMoveLeft, Game::kMoveRight};
@@ -270,7 +275,7 @@ void TDModel::updateValueMap() {
 }
 
 void TDModel::replaceValueInMap(int tile_type, string key, double update_value) {
-    printf("Update %f to key:%s in {Map Type:%d} \n", update_value, key.c_str(), tile_type);
+    // printf("Update %f to key:%s in {Map Type:%d} \n", update_value, key.c_str(), tile_type);
     if (tile_type == kTileType14) {
         std::map<string, double>::iterator it = _value_table_14.find(key); 
         if (it != _value_table_14.end()) {

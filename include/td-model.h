@@ -21,7 +21,7 @@ public:
     ~TDModel();
 
     void train(int times);
-    int test(int times);
+    void test(int times);
 
     void storeModel(string path);
     void inputModel(string path);
@@ -52,7 +52,7 @@ private:
 
     double getValueByMap(map<string, double> map, string key);
 
-    int pickMoveDirection(Game game, double& score);
+    int pickMoveDirection(Game &game, double& score);
 
     void updateValueMap();
 
