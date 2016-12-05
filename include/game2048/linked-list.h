@@ -25,6 +25,8 @@ public:
 
     void remove(int index);
 
+    void removeAll();
+
     CheckerboardIndex get(int index);
 
     bool isEmpty();
