@@ -57,6 +57,8 @@ private:
     void updateValueMap();
 
     void replaceValueInMap(int tile_type, string key, double update_value);
+
+    void deleteDoublePointer(int **board);
 };
 
 #endif

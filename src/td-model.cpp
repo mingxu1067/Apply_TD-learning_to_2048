@@ -77,7 +77,7 @@ void TDModel::test(int times) {
                 }
             }
         }
-        delete [] board;
+        deleteDoublePointer(board);
     }
     
     printf("The maximum number %d\n", max_number);
@@ -234,7 +234,7 @@ int TDModel::pickMoveDirection(Game &game, double& score) {
             }
         }
 
-        delete [] board;
+        deleteDoublePointer(board);
     }
     if (resultDirection == -1) {
         printf("Terminal state.\n");
@@ -269,7 +269,7 @@ void TDModel::updateValueMap() {
             replaceValueInMap(getTileType(col), key, update_value);
             delete [] tile;
         }
-        delete [] board;
+        deleteDoublePointer(board);
         _record_list.pop_front();
     }
 }
@@ -291,5 +291,13 @@ void TDModel::replaceValueInMap(int tile_type, string key, double update_value) 
             _value_table_23.insert(pair<string, double>(key, update_value));
         }
     }
+}
+
+void TDModel::deleteDoublePointer(int **board) {
+    for (int row=0; row<CHECKERBOARD_LENGTH; row++) {
+        delete [] board[row];
+    }
+
+    delete [] board;
 }
 
